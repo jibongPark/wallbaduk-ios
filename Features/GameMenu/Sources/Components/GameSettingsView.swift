@@ -12,6 +12,8 @@ class GameSettingsViewModel: ObservableObject {
     @Published var allowSpectators: Bool = false
     @Published var selectedAIDifficulty: AIDifficulty? = nil
     
+    var onGameStart: ((GameSettings) -> Void)?
+    
     var gameSettings: GameSettings {
         return GameSettings(
             boardSize: boardSize,
@@ -38,8 +40,8 @@ class GameSettingsViewModel: ObservableObject {
     }
     
     func startGame() {
-        // TODO: 게임 시작 로직 구현
         print("게임 시작: \(gameSettings)")
+        onGameStart?(gameSettings)
     }
 }
 
@@ -48,7 +50,11 @@ public struct GameSettingsView: View {
     @StateObject private var viewModel = GameSettingsViewModel()
     @Environment(\.dismiss) private var dismiss
     
-    public init() {}
+    let onGameStart: ((GameSettings) -> Void)?
+    
+    public init(onGameStart: ((GameSettings) -> Void)? = nil) {
+        self.onGameStart = onGameStart
+    }
     
     public var body: some View {
         NavigationView {
@@ -91,6 +97,9 @@ public struct GameSettingsView: View {
                     }
                 }
             }
+        }
+        .onAppear {
+            viewModel.onGameStart = onGameStart
         }
     }
     
