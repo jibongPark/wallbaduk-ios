@@ -9,6 +9,8 @@ public struct GameSettings {
     public let colorTheme: ColorTheme
     public let isOnlineMode: Bool
     public let allowSpectators: Bool
+    public let playerNames: [String]?
+    public let aiPlayers: Set<Int>?
     
     public init(
         boardSize: BoardSize = .small,
@@ -17,7 +19,9 @@ public struct GameSettings {
         aiDifficulty: AIDifficulty? = nil,
         colorTheme: ColorTheme = .traditional,
         isOnlineMode: Bool = false,
-        allowSpectators: Bool = false
+        allowSpectators: Bool = false,
+        playerNames: [String]? = nil,
+        aiPlayers: Set<Int>? = nil
     ) {
         self.boardSize = boardSize
         self.playerCount = playerCount
@@ -26,6 +30,8 @@ public struct GameSettings {
         self.colorTheme = colorTheme
         self.isOnlineMode = isOnlineMode
         self.allowSpectators = allowSpectators
+        self.playerNames = playerNames
+        self.aiPlayers = aiPlayers
     }
     
     /// AI 게임인지 확인
@@ -96,7 +102,9 @@ extension GameSettings: Equatable {
                lhs.aiDifficulty == rhs.aiDifficulty &&
                lhs.colorTheme == rhs.colorTheme &&
                lhs.isOnlineMode == rhs.isOnlineMode &&
-               lhs.allowSpectators == rhs.allowSpectators
+               lhs.allowSpectators == rhs.allowSpectators &&
+               lhs.playerNames == rhs.playerNames &&
+               lhs.aiPlayers == rhs.aiPlayers
     }
 }
 
