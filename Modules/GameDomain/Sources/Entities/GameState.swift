@@ -5,13 +5,13 @@ public struct GameState {
     public let id: UUID
     public let boardSize: BoardSize
     public let players: [Player]
-    public let currentPlayerIndex: Int
-    public let board: GameBoard
-    public let walls: [Wall]
-    public let turnCount: Int
-    public let gamePhase: GamePhase
+    public var currentPlayerIndex: Int
+    public var board: GameBoard
+    public var walls: [Wall]
+    public var turnCount: Int
+    public var gamePhase: GamePhase
     public let createdAt: Date
-    public let updatedAt: Date
+    public var updatedAt: Date
     
     public init(
         id: UUID = UUID(),

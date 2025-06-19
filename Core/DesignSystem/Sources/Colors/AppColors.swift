@@ -3,8 +3,8 @@ import SwiftUI
 public struct AppColors {
     
     // MARK: - Primary Colors
-    public static let primary = Color("PrimaryBlue", bundle: .module)
-    public static let secondary = Color("SecondaryGreen", bundle: .module)
+    public static let primary = Color(red: 0.0, green: 0.48, blue: 1.0) // Primary Blue
+    public static let secondary = Color(red: 0.0, green: 0.8, blue: 0.4) // Secondary Green
     
     // MARK: - Player Colors
     public static let player1 = Color.black
@@ -18,15 +18,8 @@ public struct AppColors {
     public static let boardBackground = Color(red: 0.94, green: 0.87, blue: 0.69)
     
     // MARK: - UI Colors
-    public static let background = Color("Background", bundle: .module)
-    public static let surface = Color("Surface", bundle: .module)
-    public static let text = Color("Text", bundle: .module)
-    public static let textSecondary = Color("TextSecondary", bundle: .module)
+    public static let background = Color(red: 0.98, green: 0.98, blue: 0.98) // Light background
+    public static let surface = Color.white // Surface color
+    public static let text = Color.primary // Primary text
+    public static let textSecondary = Color.secondary // Secondary text
 }
-
-// MARK: - Dynamic Color Support
-extension Color {
-    init(_ name: String, bundle: Bundle) {
-        self.init(name, bundle: bundle)
-    }
-} 
