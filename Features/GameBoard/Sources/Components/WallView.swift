@@ -55,9 +55,9 @@ public struct WallView: View {
     }
     
     private var wallPosition: CGPoint {
-        let gridPos = wall.position.gridPosition
-        let baseX = CGFloat(gridPos.column) * cellSize + cellSize / 2
-        let baseY = CGFloat(gridPos.row) * cellSize + cellSize / 2
+        let gridPos = wall.position
+        let baseX = CGFloat(gridPos.x) * cellSize + cellSize / 2
+        let baseY = CGFloat(gridPos.y) * cellSize + cellSize / 2
         
         switch wall.orientation {
         case .horizontal:

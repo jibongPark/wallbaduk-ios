@@ -39,8 +39,8 @@ public struct PieceView: View {
                     .stroke(strokeColor, lineWidth: 2)
             )
             .position(
-                x: CGFloat(piece.position.gridPosition.column) * cellSize + cellSize / 2,
-                y: CGFloat(piece.position.gridPosition.row) * cellSize + cellSize / 2
+                x: CGFloat(piece.position.x) * cellSize + cellSize / 2,
+                y: CGFloat(piece.position.y) * cellSize + cellSize / 2
             )
             .scaleEffect(isPressed ? 0.9 : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isPressed)
@@ -62,18 +62,10 @@ public struct PieceView: View {
     }
     
     private var playerColor: Color {
-        switch piece.player.id.uuidString.suffix(1) {
-        case "1":
-            return AppColors.player1
-        case "2":
-            return AppColors.player2
-        case "3":
-            return AppColors.player3
-        case "4":
-            return AppColors.player4
-        default:
-            return piece.player.isAI ? AppColors.player2 : AppColors.player1
-        }
+        // ownerID를 기반으로 색상 결정
+        // 첫 번째 플레이어는 검은색, 두 번째 플레이어는 흰색
+        let isBlackPiece = piece.ownerID.uuidString.hashValue % 2 == 0
+        return isBlackPiece ? AppColors.player1 : AppColors.player2
     }
     
     private var strokeColor: Color {
@@ -81,6 +73,10 @@ public struct PieceView: View {
     }
     
     private var pieceSize: CGFloat {
-        cellSize * 0.7
+        cellSize * 0.8
+    }
+    
+    private var selectionStrokeColor: Color {
+        playerColor == AppColors.player2 ? AppColors.player1 : AppColors.surface
     }
 } 

@@ -19,8 +19,8 @@ public struct HighlightView: View {
             .fill(AppColors.highlight)
             .frame(width: highlightSize, height: highlightSize)
             .position(
-                x: CGFloat(position.gridPosition.column) * cellSize + cellSize / 2,
-                y: CGFloat(position.gridPosition.row) * cellSize + cellSize / 2
+                x: CGFloat(position.gridPosition.x) * cellSize + cellSize / 2,
+                y: CGFloat(position.gridPosition.y) * cellSize + cellSize / 2
             )
             .scaleEffect(animationScale)
             .opacity(animationOpacity)

@@ -2,6 +2,47 @@ import SwiftUI
 import GameDomain
 import DesignSystem
 
+/// 게임 설정 ViewModel
+class GameSettingsViewModel: ObservableObject {
+    @Published var boardSize: BoardSize = .small
+    @Published var playerCount: Int = 2
+    @Published var timeLimit: TimeLimit = .medium
+    @Published var colorTheme: ColorTheme = .traditional
+    @Published var isOnlineMode: Bool = false
+    @Published var allowSpectators: Bool = false
+    @Published var selectedAIDifficulty: AIDifficulty? = nil
+    
+    var gameSettings: GameSettings {
+        return GameSettings(
+            boardSize: boardSize,
+            playerCount: playerCount,
+            timeLimit: timeLimit,
+            aiDifficulty: selectedAIDifficulty,
+            colorTheme: colorTheme,
+            isOnlineMode: isOnlineMode,
+            allowSpectators: allowSpectators
+        )
+    }
+    
+    var isAIMode: Binding<Bool> {
+        Binding(
+            get: { self.selectedAIDifficulty != nil },
+            set: { newValue in
+                if newValue {
+                    self.selectedAIDifficulty = .easy
+                } else {
+                    self.selectedAIDifficulty = nil
+                }
+            }
+        )
+    }
+    
+    func startGame() {
+        // TODO: 게임 시작 로직 구현
+        print("게임 시작: \(gameSettings)")
+    }
+}
+
 /// 게임 설정 화면
 public struct GameSettingsView: View {
     @StateObject private var viewModel = GameSettingsViewModel()
@@ -22,7 +63,7 @@ public struct GameSettingsView: View {
                 // AI 설정 섹션
                 Section("AI 설정") {
                     aiModeToggle
-                    if viewModel.gameSettings.isAIGame {
+                    if viewModel.selectedAIDifficulty != nil {
                         aiDifficultySection
                     }
                 }
@@ -31,7 +72,7 @@ public struct GameSettingsView: View {
                 Section("고급 설정") {
                     colorThemeSection
                     onlineModeToggle
-                    if viewModel.gameSettings.isOnlineMode {
+                    if viewModel.isOnlineMode {
                         allowSpectatorsToggle
                     }
                 }
@@ -58,7 +99,7 @@ public struct GameSettingsView: View {
         HStack {
             Text("보드 크기")
             Spacer()
-            Picker("보드 크기", selection: $viewModel.gameSettings.boardSize) {
+            Picker("보드 크기", selection: $viewModel.boardSize) {
                 ForEach(BoardSize.allCases.filter { $0 != .large }, id: \.self) { size in
                     Text(size.displayName).tag(size)
                 }
@@ -73,7 +114,7 @@ public struct GameSettingsView: View {
         HStack {
             Text("플레이어 수")
             Spacer()
-            Picker("플레이어 수", selection: $viewModel.gameSettings.playerCount) {
+            Picker("플레이어 수", selection: $viewModel.playerCount) {
                 ForEach(2...4, id: \.self) { count in
                     Text("\(count)명").tag(count)
                 }
@@ -88,7 +129,7 @@ public struct GameSettingsView: View {
         HStack {
             Text("제한 시간")
             Spacer()
-            Picker("제한 시간", selection: $viewModel.gameSettings.timeLimit) {
+            Picker("제한 시간", selection: $viewModel.timeLimit) {
                 ForEach(TimeLimit.allCases, id: \.self) { timeLimit in
                     Text(timeLimit.displayName).tag(timeLimit)
                 }
@@ -99,7 +140,7 @@ public struct GameSettingsView: View {
     
     // MARK: - AI 모드 토글
     private var aiModeToggle: some View {
-        Toggle("AI와 게임", isOn: $viewModel.isAIMode)
+        Toggle("AI와 게임", isOn: viewModel.isAIMode)
     }
     
     // MARK: - AI 난이도 섹션
@@ -122,7 +163,7 @@ public struct GameSettingsView: View {
         HStack {
             Text("색상 테마")
             Spacer()
-            Picker("색상 테마", selection: $viewModel.gameSettings.colorTheme) {
+            Picker("색상 테마", selection: $viewModel.colorTheme) {
                 ForEach(ColorTheme.allCases, id: \.self) { theme in
                     Text(theme.displayName).tag(theme)
                 }
@@ -133,13 +174,13 @@ public struct GameSettingsView: View {
     
     // MARK: - 온라인 모드 토글
     private var onlineModeToggle: some View {
-        Toggle("온라인 게임", isOn: $viewModel.gameSettings.isOnlineMode)
+        Toggle("온라인 게임", isOn: $viewModel.isOnlineMode)
             .disabled(true) // 현재 미구현
     }
     
     // MARK: - 관전자 허용 토글
     private var allowSpectatorsToggle: some View {
-        Toggle("관전자 허용", isOn: $viewModel.gameSettings.allowSpectators)
+        Toggle("관전자 허용", isOn: $viewModel.allowSpectators)
     }
     
     // MARK: - 게임 시작 버튼

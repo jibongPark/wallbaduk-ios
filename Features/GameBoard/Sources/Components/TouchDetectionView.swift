@@ -4,12 +4,12 @@ import GameDomain
 public struct TouchDetectionView: View {
     let boardSize: BoardSize
     let cellSize: CGFloat
-    let onPositionTapped: (Position) -> Void
+    let onPositionTapped: (GridPosition) -> Void
     
     public init(
         boardSize: BoardSize,
         cellSize: CGFloat,
-        onPositionTapped: @escaping (Position) -> Void
+        onPositionTapped: @escaping (GridPosition) -> Void
     ) {
         self.boardSize = boardSize
         self.cellSize = cellSize
@@ -17,30 +17,28 @@ public struct TouchDetectionView: View {
     }
     
     public var body: some View {
-        let totalSize = cellSize * CGFloat(boardSize.gridCount)
+        let totalSize = cellSize * CGFloat(boardSize.gridSize)
         
         Rectangle()
             .fill(Color.clear)
             .frame(width: totalSize, height: totalSize)
             .contentShape(Rectangle())
             .onTapGesture { location in
-                handleTap(at: location)
+                handleTap(at: location, totalSize: totalSize)
             }
     }
     
-    private func handleTap(at location: CGPoint) {
+    private func handleTap(at location: CGPoint, totalSize: CGFloat) {
         let column = Int(location.x / cellSize)
         let row = Int(location.y / cellSize)
         
-        // 보드 경계 확인
-        guard column >= 0 && column < boardSize.gridCount,
-              row >= 0 && row < boardSize.gridCount else {
+        // 유효한 위치인지 확인
+        guard column >= 0 && column < boardSize.gridSize,
+              row >= 0 && row < boardSize.gridSize else {
             return
         }
         
-        let gridPosition = GridPosition(row: row, column: column)
-        let position = Position(gridPosition: gridPosition)
-        
-        onPositionTapped(position)
+        let gridPosition = GridPosition(x: column, y: row)
+        onPositionTapped(gridPosition)
     }
 } 

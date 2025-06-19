@@ -134,7 +134,8 @@ private struct CurrentPlayerView: View {
     }
     
     private func playerColor(for player: Player) -> Color {
-        player.isAI ? AppColors.player2 : AppColors.player1
+        // isAI 속성을 기반으로 색상 구분
+        return player.isAI ? AppColors.player2 : AppColors.player1
     }
     
     private func playerName(for player: Player) -> String {
@@ -164,13 +165,13 @@ private struct GameStatsView: View {
             
             StatItem(
                 title: "벽 개수",
-                value: "\(gameState.gameBoard.walls.count)"
+                value: "\(gameState.walls.count)"
             )
         }
     }
     
     private var activePiecesCount: Int {
-        gameState.gameBoard.pieces.filter { $0.isActive }.count
+        gameState.board.pieces.filter { $0.isActive }.count
     }
 }
 

@@ -25,15 +25,15 @@ public struct BoardView: View {
     
     public var body: some View {
         GeometryReader { geometry in
-            let cellSize = min(geometry.size.width, geometry.size.height) / CGFloat(boardSize.gridCount)
+            let cellSize = min(geometry.size.width, geometry.size.height) / CGFloat(boardSize.gridSize)
             
             ZStack {
-                // 게임판 배경
+                // 바둑판 배경
                 Rectangle()
                     .fill(AppColors.boardBackground)
                     .frame(
-                        width: cellSize * CGFloat(boardSize.gridCount),
-                        height: cellSize * CGFloat(boardSize.gridCount)
+                        width: cellSize * CGFloat(boardSize.gridSize),
+                        height: cellSize * CGFloat(boardSize.gridSize)
                     )
                 
                 // 격자 라인
@@ -54,22 +54,22 @@ public struct BoardView: View {
                 }
                 
                 // 게임 말들
-                ForEach(gameState.gameBoard.pieces, id: \.id) { piece in
+                ForEach(gameState.board.pieces, id: \.id) { piece in
                     if piece.isActive {
                         PieceView(
                             piece: piece,
                             cellSize: cellSize,
-                            isSelected: selectedPosition == piece.position,
+                            isSelected: selectedPosition?.gridPosition == piece.position,
                             onTapped: {
-                                selectedPosition = piece.position
-                                onPieceTapped(piece.position)
+                                selectedPosition = Position(gridPosition: piece.position)
+                                onPieceTapped(Position(gridPosition: piece.position))
                             }
                         )
                     }
                 }
                 
                 // 벽들
-                ForEach(gameState.gameBoard.walls, id: \.id) { wall in
+                ForEach(gameState.walls, id: \.id) { wall in
                     WallView(
                         wall: wall,
                         cellSize: cellSize
@@ -80,7 +80,9 @@ public struct BoardView: View {
                 TouchDetectionView(
                     boardSize: boardSize,
                     cellSize: cellSize,
-                    onPositionTapped: onPositionTapped
+                    onPositionTapped: { gridPosition in
+                        onPositionTapped(Position(gridPosition: gridPosition))
+                    }
                 )
             }
         }

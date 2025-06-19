@@ -12,11 +12,11 @@ public struct GridLinesView: View {
     }
     
     public var body: some View {
-        let totalSize = cellSize * CGFloat(boardSize.gridCount)
+        let totalSize = cellSize * CGFloat(boardSize.gridSize)
         
         ZStack {
             // 수직 라인들
-            ForEach(0...boardSize.gridCount, id: \.self) { column in
+            ForEach(0...boardSize.gridSize, id: \.self) { column in
                 Rectangle()
                     .fill(AppColors.gridLine)
                     .frame(width: 1, height: totalSize)
@@ -27,7 +27,7 @@ public struct GridLinesView: View {
             }
             
             // 수평 라인들
-            ForEach(0...boardSize.gridCount, id: \.self) { row in
+            ForEach(0...boardSize.gridSize, id: \.self) { row in
                 Rectangle()
                     .fill(AppColors.gridLine)
                     .frame(width: totalSize, height: 1)
