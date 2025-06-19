@@ -33,8 +33,11 @@ public final class PlaceStoneUseCase: PlaceStoneUseCaseProtocol {
             
             // 새로운 게임 상태 생성
             var newGameState = gameState
-            let stone = Stone(color: move.player.color, position: position)
-            newGameState.board.placeStone(stone)
+            let piece = GamePiece(
+                ownerID: move.player.id,
+                position: position.toGridPosition()
+            )
+            newGameState.board.placePiece(piece, at: position)
             newGameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.count
             
             // 상태 저장
@@ -49,19 +52,4 @@ public final class PlaceStoneUseCase: PlaceStoneUseCaseProtocol {
     }
 }
 
-public enum GameError: Error, LocalizedError {
-    case invalidMove(String)
-    case gameNotFound
-    case saveError
-    
-    public var errorDescription: String? {
-        switch self {
-        case .invalidMove(let message):
-            return "Invalid move: \(message)"
-        case .gameNotFound:
-            return "Game not found"
-        case .saveError:
-            return "Failed to save game"
-        }
-    }
-} 
+ 

@@ -6,10 +6,31 @@ let package = Package(
     platforms: [
         .iOS(.v16)
     ],
-    products: [],
+    products: [
+        .library(
+            name: "GameDomain",
+            targets: ["GameDomain"]
+        )
+    ],
     dependencies: [
         .package(url: "https://github.com/uber/RIBs", from: "0.14.1"),
         .package(url: "https://github.com/ReactiveX/RxSwift", from: "6.6.0")
     ],
-    targets: []
+    targets: [
+        .target(
+            name: "GameDomain",
+            dependencies: [
+                .product(name: "RxSwift", package: "RxSwift")
+            ],
+            path: "Modules/GameDomain/Sources"
+        ),
+        .testTarget(
+            name: "GameDomainTests",
+            dependencies: [
+                "GameDomain",
+                .product(name: "RxSwift", package: "RxSwift")
+            ],
+            path: "Modules/GameDomain/Tests"
+        )
+    ]
 ) 

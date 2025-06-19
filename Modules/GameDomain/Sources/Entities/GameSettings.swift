@@ -28,14 +28,14 @@ public struct GameSettings {
         self.allowSpectators = allowSpectators
     }
     
-    /// 유효한 설정인지 확인
-    public var isValid: Bool {
-        return playerCount >= 2 && playerCount <= 4
-    }
-    
     /// AI 게임인지 확인
     public var isAIGame: Bool {
         return aiDifficulty != nil
+    }
+    
+    /// 유효한 설정인지 확인
+    public var isValid: Bool {
+        return playerCount >= 2 && playerCount <= 4
     }
 }
 

@@ -47,6 +47,11 @@ public struct Position {
         return GridPosition(x: column, y: row)
     }
     
+    /// GridPosition으로 변환하는 메소드
+    public func toGridPosition() -> GridPosition {
+        return GridPosition(x: column, y: row)
+    }
+    
     /// GridPosition에서 변환
     public init(gridPosition: GridPosition) {
         self.row = gridPosition.y
