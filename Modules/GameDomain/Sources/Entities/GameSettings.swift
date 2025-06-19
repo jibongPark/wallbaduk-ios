@@ -46,13 +46,17 @@ public enum TimeLimit: Int, CaseIterable {
     case long = 90      // 1분 30초
     case unlimited = 0  // 무제한
     
-    public var displayName: String {
+    public var description: String {
         switch self {
         case .short: return "30초"
         case .medium: return "1분"
         case .long: return "1분 30초"
         case .unlimited: return "무제한"
         }
+    }
+    
+    public var displayName: String {
+        return description
     }
     
     public var seconds: Int {
@@ -70,12 +74,16 @@ public enum ColorTheme: String, CaseIterable {
     case modern = "modern"
     case dark = "dark"
     
-    public var displayName: String {
+    public var description: String {
         switch self {
         case .traditional: return "전통"
         case .modern: return "모던"
         case .dark: return "다크"
         }
+    }
+    
+    public var displayName: String {
+        return description
     }
 }
 

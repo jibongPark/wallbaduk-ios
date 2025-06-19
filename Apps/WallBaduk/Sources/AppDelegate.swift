@@ -1,6 +1,7 @@
 import UIKit
 import RIBs
 import GameMenu
+import GameBoard
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -27,6 +28,7 @@ final class EmptyDependency: AppDependency {}
 
 // MARK: - App Component Extension
 extension AppComponent: GameMenuDependency {}
+extension AppComponent: GameBoardDependency {}
 
 // MARK: - Basic RIB Setup
 protocol LaunchRouting: ViewableRouting {
@@ -36,10 +38,13 @@ protocol LaunchRouting: ViewableRouting {
 final class RootRouter: ViewableRouter<RootInteractable, RootViewControllable>, LaunchRouting, RootRouting {
     
     private let gameMenuBuilder: GameMenuBuildable
+    private let gameBoardBuilder: GameBoardBuildable
     private var gameMenuRouter: GameMenuRouting?
+    private var gameBoardRouter: GameBoardRouting?
     
-    init(interactor: RootInteractable, viewController: RootViewControllable, gameMenuBuilder: GameMenuBuildable) {
+    init(interactor: RootInteractable, viewController: RootViewControllable, gameMenuBuilder: GameMenuBuildable, gameBoardBuilder: GameBoardBuildable) {
         self.gameMenuBuilder = gameMenuBuilder
+        self.gameBoardBuilder = gameBoardBuilder
         super.init(interactor: interactor, viewController: viewController)
         interactor.router = self
     }
@@ -52,9 +57,34 @@ final class RootRouter: ViewableRouter<RootInteractable, RootViewControllable>, 
         window.rootViewController = gameMenuRouter.viewControllable.uiviewController
         window.makeKeyAndVisible()
     }
+    
+    // MARK: - RootRouting
+    
+    func routeToGameBoard(with gameSettings: GameSettings) {
+        guard let gameMenuRouter = self.gameMenuRouter else { return }
+        
+        let gameBoardRouter = gameBoardBuilder.build(withListener: interactor, gameSettings: gameSettings)
+        self.gameBoardRouter = gameBoardRouter
+        
+        attachChild(gameBoardRouter)
+        
+        // GameMenu의 viewController를 통해 전체화면으로 GameBoard 표시
+        let gameBoardViewController = gameBoardRouter.viewControllable.uiviewController
+        gameBoardViewController.modalPresentationStyle = .fullScreen
+        gameMenuRouter.viewControllable.uiviewController.present(gameBoardViewController, animated: true)
+    }
+    
+    func detachGameBoard() {
+        guard let gameBoardRouter = gameBoardRouter else { return }
+        
+        gameBoardRouter.viewControllable.uiviewController.dismiss(animated: true) { [weak self] in
+            self?.detachChild(gameBoardRouter)
+            self?.gameBoardRouter = nil
+        }
+    }
 }
 
-protocol RootInteractable: Interactable, GameMenuListener {
+protocol RootInteractable: Interactable, GameMenuListener, GameBoardListener {
     var router: RootRouting? { get set }
     var listener: RootListener? { get set }
 }
@@ -76,8 +106,18 @@ final class RootInteractor: Interactor, RootInteractable {
     
     // MARK: - GameMenuListener
     func gameMenuDidRequestGameStart() {
-        // TODO: 게임 시작 로직 구현
+        // 게임 시작 요청 시 아무 동작 없음 (GameMenuRouter에서 직접 처리)
         print("게임 시작 요청됨")
+    }
+    
+    func gameMenuDidRequestGameStart(with gameSettings: GameSettings) {
+        // 게임 설정과 함께 게임 시작 요청
+        router?.routeToGameBoard(with: gameSettings)
+    }
+    
+    // MARK: - GameBoardListener
+    func gameBoardDidFinish() {
+        router?.detachGameBoard()
     }
 }
 
@@ -91,14 +131,19 @@ final class RootBuilder: Builder<AppComponent>, RootBuildable {
         let viewController = RootViewController()
         let interactor = RootInteractor()
         let gameMenuBuilder = GameMenuBuilder(dependency: dependency)
+        let gameBoardBuilder = GameBoardBuilder(dependency: dependency)
         
         return RootRouter(
             interactor: interactor,
             viewController: viewController,
-            gameMenuBuilder: gameMenuBuilder
+            gameMenuBuilder: gameMenuBuilder,
+            gameBoardBuilder: gameBoardBuilder
         )
     }
 }
 
-protocol RootRouting: ViewableRouting {}
+protocol RootRouting: ViewableRouting {
+    func routeToGameBoard(with gameSettings: GameSettings)
+    func detachGameBoard()
+}
 protocol RootListener: AnyObject {} 

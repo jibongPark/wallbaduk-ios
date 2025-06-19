@@ -31,7 +31,7 @@ public protocol GameMenuDependency: Dependency {}
 // MARK: - GameMenu Router
 public protocol GameMenuRouting: ViewableRouting {
     func showGameSettings()
-    func dismissGameSettings()
+    func dismissGameSettings(completion: (() -> Void)?)
 }
 
 public final class GameMenuRouter: ViewableRouter<GameMenuInteractable, GameMenuViewControllable>, GameMenuRouting {
@@ -43,17 +43,18 @@ public final class GameMenuRouter: ViewableRouter<GameMenuInteractable, GameMenu
     
     public func showGameSettings() {
         let gameSettingsView = GameSettingsView { [weak self] gameSettings in
-            // 게임 설정이 완료되면 listener에게 알림
-            self?.interactor.listener?.gameMenuDidRequestGameStart()
-            // 설정 화면 닫기
-            self?.dismissGameSettings()
+            // 먼저 설정 화면을 닫고, 완료 후에 게임 시작
+            self?.dismissGameSettings {
+                // 게임 설정이 완료되면 listener에게 알림
+                self?.interactor.listener?.gameMenuDidRequestGameStart(with: gameSettings)
+            }
         }
         let hostingController = UIHostingController(rootView: gameSettingsView)
         viewController.uiviewController.present(hostingController, animated: true)
     }
     
-    public func dismissGameSettings() {
-        viewController.uiviewController.dismiss(animated: true)
+    public func dismissGameSettings(completion: (() -> Void)? = nil) {
+        viewController.uiviewController.dismiss(animated: true, completion: completion)
     }
 }
 
@@ -65,6 +66,7 @@ public protocol GameMenuInteractable: Interactable {
 
 public protocol GameMenuListener: AnyObject {
     func gameMenuDidRequestGameStart()
+    func gameMenuDidRequestGameStart(with gameSettings: GameSettings)
 }
 
 public final class GameMenuInteractor: Interactor, GameMenuInteractable {
