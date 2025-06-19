@@ -1,6 +1,6 @@
 import RIBs
 import GameDomain
-import GameData
+//import GameData
 
 protocol AppDependency: Dependency {
     // 외부 의존성 (없음)

@@ -4,7 +4,7 @@ import Foundation
 public struct GameBoard: Equatable {
     public let size: BoardSize
     public private(set) var stones: [Position: Stone]
-    public private(set) var capturedStones: [StoneColor: [Stone]]
+    public private(set) var capturedStones: [PlayerColor: [Stone]]
     public private(set) var gamePieces: [GamePiece]
     public let grid: [[Cell]]
     
