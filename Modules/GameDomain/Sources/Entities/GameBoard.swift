@@ -3,16 +3,12 @@ import Foundation
 /// 게임보드 엔티티
 public struct GameBoard: Equatable {
     public let size: BoardSize
-    public private(set) var stones: [Position: Stone]
-    public private(set) var capturedStones: [PlayerColor: [Stone]]
-    public private(set) var gamePieces: [GamePiece]
+    public private(set) var pieces: [GamePiece]
     public let grid: [[Cell]]
     
     public init(size: BoardSize) {
         self.size = size
-        self.stones = [:]
-        self.capturedStones = [.black: [], .white: []]
-        self.gamePieces = []
+        self.pieces = []
         self.grid = GameBoard.createEmptyGrid(size: size)
     }
     
@@ -26,35 +22,112 @@ public struct GameBoard: Equatable {
         }
     }
     
-    // MARK: - Stone 관련 메서드
-    public func stone(at position: Position) -> Stone? {
-        return stones[position]
+    // MARK: - GamePiece 관련 메서드
+    
+    /// Position에서 GamePiece 가져오기
+    public func getPiece(at position: Position) -> GamePiece? {
+        let gridPos = position.toGridPosition()
+        return pieces.first { $0.position == gridPos && $0.isActive }
     }
     
+    /// GridPosition에서 GamePiece 가져오기
+    public func getPiece(at position: GridPosition) -> GamePiece? {
+        return pieces.first { $0.position == position && $0.isActive }
+    }
+    
+    /// 특정 위치에 활성 GamePiece가 있는지 확인 (Position)
+    public func hasPiece(at position: Position) -> Bool {
+        return getPiece(at: position) != nil
+    }
+    
+    /// 특정 위치에 활성 GamePiece가 있는지 확인 (GridPosition)
+    public func hasPiece(at position: GridPosition) -> Bool {
+        return getPiece(at: position) != nil
+    }
+    
+    /// 특정 위치가 비어있는지 확인 (Position)
     public func isEmpty(at position: Position) -> Bool {
-        return stones[position] == nil
+        return !hasPiece(at: position)
     }
     
-    public mutating func placeStone(_ stone: Stone) {
-        stones[stone.position] = stone
+    /// 특정 위치가 비어있는지 확인 (GridPosition)
+    public func isEmpty(at position: GridPosition) -> Bool {
+        return !hasPiece(at: position)
     }
     
-    public mutating func removeStone(at position: Position) -> Stone? {
-        return stones.removeValue(forKey: position)
+    /// GamePiece를 특정 위치에 배치
+    public mutating func placePiece(_ piece: GamePiece, at position: Position) {
+        let gridPos = position.toGridPosition()
+        let newPiece = GamePiece(
+            id: piece.id,
+            ownerID: piece.ownerID,
+            position: gridPos,
+            isActive: piece.isActive,
+            moveCount: piece.moveCount
+        )
+        pieces.append(newPiece)
     }
     
-    public mutating func captureStones(_ stones: [Stone]) {
-        for stone in stones {
-            self.stones.removeValue(forKey: stone.position)
-            capturedStones[stone.color]?.append(stone)
+    /// GamePiece를 특정 위치에 배치 (GridPosition)
+    public mutating func placePiece(_ piece: GamePiece, at position: GridPosition) {
+        let newPiece = GamePiece(
+            id: piece.id,
+            ownerID: piece.ownerID,
+            position: position,
+            isActive: piece.isActive,
+            moveCount: piece.moveCount
+        )
+        pieces.append(newPiece)
+    }
+    
+    /// 특정 위치에서 GamePiece 제거
+    public mutating func removePiece(at position: Position) -> GamePiece? {
+        let gridPos = position.toGridPosition()
+        if let index = pieces.firstIndex(where: { $0.position == gridPos && $0.isActive }) {
+            let piece = pieces[index]
+            pieces.remove(at: index)
+            return piece
         }
+        return nil
     }
     
+    /// 특정 위치에서 GamePiece 제거 (GridPosition)
+    public mutating func removePiece(at position: GridPosition) -> GamePiece? {
+        if let index = pieces.firstIndex(where: { $0.position == position && $0.isActive }) {
+            let piece = pieces[index]
+            pieces.remove(at: index)
+            return piece
+        }
+        return nil
+    }
+    
+    /// GamePiece 추가
+    public mutating func addPiece(_ piece: GamePiece) {
+        pieces.append(piece)
+    }
+    
+    /// 특정 플레이어의 활성 GamePiece들 가져오기
+    public func getActivePieces(for playerID: UUID) -> [GamePiece] {
+        return pieces.filter { $0.ownerID == playerID && $0.isActive }
+    }
+    
+    /// 모든 활성 GamePiece들 가져오기
+    public func getAllActivePieces() -> [GamePiece] {
+        return pieces.filter { $0.isActive }
+    }
+    
+    /// Position이 유효한지 확인
     public func isValidPosition(_ position: Position) -> Bool {
         return position.row >= 0 && position.row < size.rawValue &&
                position.column >= 0 && position.column < size.rawValue
     }
     
+    /// GridPosition이 유효한지 확인
+    public func isValidPosition(_ position: GridPosition) -> Bool {
+        return position.isValid(for: size)
+    }
+    
+    /// Position의 인접 위치들 가져오기
     public func getAdjacentPositions(of position: Position) -> [Position] {
         let directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         return directions.compactMap { dr, dc in
@@ -63,13 +136,18 @@ public struct GameBoard: Equatable {
         }
     }
     
-    // MARK: - GamePiece 관련 메서드
+    /// GridPosition의 인접 위치들 가져오기
+    public func getAdjacentGridPositions(of position: GridPosition) -> [GridPosition] {
+        return position.adjacentPositions().filter { isValidPosition($0) }
+    }
+
+    // MARK: - 기존 메서드들 (호환성 유지)
     public func hasGamePiece(at position: GridPosition) -> Bool {
-        return gamePieces.contains { $0.position == position && $0.isActive }
+        return hasPiece(at: position)
     }
     
     public func gamePiece(at position: GridPosition) -> GamePiece? {
-        return gamePieces.first { $0.position == position && $0.isActive }
+        return getPiece(at: position)
     }
     
     public func cell(at position: GridPosition) -> Cell? {
@@ -78,17 +156,17 @@ public struct GameBoard: Equatable {
     }
     
     public func movingPiece(from fromPosition: GridPosition, to toPosition: GridPosition) -> GameBoard {
-        guard let pieceIndex = gamePieces.firstIndex(where: { $0.position == fromPosition && $0.isActive }) else {
+        guard let pieceIndex = pieces.firstIndex(where: { $0.position == fromPosition && $0.isActive }) else {
             return self
         }
         
         var newBoard = self
-        newBoard.gamePieces[pieceIndex] = GamePiece(
-            id: gamePieces[pieceIndex].id,
-            ownerID: gamePieces[pieceIndex].ownerID,
+        newBoard.pieces[pieceIndex] = GamePiece(
+            id: pieces[pieceIndex].id,
+            ownerID: pieces[pieceIndex].ownerID,
             position: toPosition,
-            isActive: gamePieces[pieceIndex].isActive,
-            moveCount: gamePieces[pieceIndex].moveCount + 1
+            isActive: pieces[pieceIndex].isActive,
+            moveCount: pieces[pieceIndex].moveCount + 1
         )
         
         return newBoard
@@ -96,7 +174,7 @@ public struct GameBoard: Equatable {
     
     public func addingPiece(_ piece: GamePiece) -> GameBoard {
         var newBoard = self
-        newBoard.gamePieces.append(piece)
+        newBoard.pieces.append(piece)
         return newBoard
     }
     
@@ -105,7 +183,7 @@ public struct GameBoard: Equatable {
         var territories: [UUID: Int] = [:]
         
         for player in players {
-            let playerPieces = gamePieces.filter { $0.ownerID == player.id && $0.isActive }
+            let playerPieces = pieces.filter { $0.ownerID == player.id && $0.isActive }
             var totalTerritory = 0
             
             for piece in playerPieces {

@@ -3,8 +3,7 @@ import Foundation
 /// 게임 이동 타입
 public enum MoveType: String, CaseIterable {
     case place = "place"
-    case pass = "pass"
-    case resign = "resign"
+    case move = "move"
 }
 
 /// 게임 이동 엔티티
@@ -13,6 +12,8 @@ public struct GameMove: Equatable, Hashable {
     public let player: Player
     public let type: MoveType
     public let position: Position?
+    public let fromPosition: Position? // 말 이동시 시작 위치
+    public let toPosition: Position?   // 말 이동시 목표 위치
     public let timestamp: Date
     public let moveNumber: Int
     
@@ -21,6 +22,8 @@ public struct GameMove: Equatable, Hashable {
         player: Player,
         type: MoveType,
         position: Position? = nil,
+        fromPosition: Position? = nil,
+        toPosition: Position? = nil,
         timestamp: Date = Date(),
         moveNumber: Int
     ) {
@@ -28,6 +31,8 @@ public struct GameMove: Equatable, Hashable {
         self.player = player
         self.type = type
         self.position = position
+        self.fromPosition = fromPosition
+        self.toPosition = toPosition
         self.timestamp = timestamp
         self.moveNumber = moveNumber
     }
@@ -42,20 +47,13 @@ public struct GameMove: Equatable, Hashable {
         )
     }
     
-    /// 패스 이동 생성
-    public static func pass(player: Player, moveNumber: Int) -> GameMove {
+    /// 말 이동 생성
+    public static func move(player: Player, from: Position, to: Position, moveNumber: Int) -> GameMove {
         return GameMove(
             player: player,
-            type: .pass,
-            moveNumber: moveNumber
-        )
-    }
-    
-    /// 기권 이동 생성
-    public static func resign(player: Player, moveNumber: Int) -> GameMove {
-        return GameMove(
-            player: player,
-            type: .resign,
+            type: .move,
+            fromPosition: from,
+            toPosition: to,
             moveNumber: moveNumber
         )
     }

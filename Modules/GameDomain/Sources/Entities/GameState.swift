@@ -8,6 +8,7 @@ public struct GameState {
     public var currentPlayerIndex: Int
     public var board: GameBoard
     public var walls: [Wall]
+    public var moves: [GameMove]
     public var turnCount: Int
     public var gamePhase: GamePhase
     public let createdAt: Date
@@ -20,6 +21,7 @@ public struct GameState {
         currentPlayerIndex: Int = 0,
         board: GameBoard,
         walls: [Wall] = [],
+        moves: [GameMove] = [],
         turnCount: Int = 0,
         gamePhase: GamePhase = .playing,
         createdAt: Date = Date(),
@@ -31,6 +33,7 @@ public struct GameState {
         self.currentPlayerIndex = currentPlayerIndex
         self.board = board
         self.walls = walls
+        self.moves = moves
         self.turnCount = turnCount
         self.gamePhase = gamePhase
         self.createdAt = createdAt
@@ -55,6 +58,7 @@ public struct GameState {
             currentPlayerIndex: nextIndex,
             board: board,
             walls: walls,
+            moves: moves,
             turnCount: turnCount + 1,
             gamePhase: gamePhase,
             createdAt: createdAt,
