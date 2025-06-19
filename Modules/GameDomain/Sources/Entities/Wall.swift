@@ -32,6 +32,11 @@ public struct Wall {
         }
     }
     
+    /// 벽이 두 위치 사이의 경로를 차단하는지 확인 (blocks와 동일한 기능)
+    public func blocksPath(from: GridPosition, to: GridPosition) -> Bool {
+        return blocks(movementFrom: from, to: to)
+    }
+    
     /// 수평 벽이 이동을 막는지 확인
     private func blocksHorizontalMovement(from: GridPosition, to: GridPosition) -> Bool {
         // 세로 이동을 막는 수평 벽
