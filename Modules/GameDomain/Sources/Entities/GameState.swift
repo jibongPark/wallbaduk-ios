@@ -70,6 +70,37 @@ public struct GameState {
     public var isGameFinished: Bool {
         return gamePhase == .finished
     }
+    
+    /// 초기 게임 상태 생성
+    public static func initial(boardSize: BoardSize, playerCount: Int) -> GameState {
+        // 기본 플레이어들 생성
+        let playerColors: [PlayerColor] = [.black, .white, .blue, .green]
+        let players = (0..<playerCount).map { index in
+            Player(
+                id: UUID(),
+                name: "플레이어 \(index + 1)",
+                color: playerColors[index],
+                pieces: [],
+                score: 0,
+                isAI: false,
+                aiDifficulty: nil
+            )
+        }
+        
+        // 빈 게임 보드 생성
+        let board = GameBoard(size: boardSize)
+        
+        return GameState(
+            boardSize: boardSize,
+            players: players,
+            currentPlayerIndex: 0,
+            board: board,
+            walls: [],
+            moves: [],
+            turnCount: 0,
+            gamePhase: .setup
+        )
+    }
 }
 
 /// 게임 진행 단계

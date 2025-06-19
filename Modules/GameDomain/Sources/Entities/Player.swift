@@ -62,12 +62,16 @@ public enum AIDifficulty: String, CaseIterable {
     case medium = "medium"
     case hard = "hard"
     
-    public var displayName: String {
+    public var description: String {
         switch self {
         case .easy: return "쉬움"
         case .medium: return "보통"
         case .hard: return "어려움"
         }
+    }
+    
+    public var displayName: String {
+        return description
     }
     
     public var searchDepth: Int {
